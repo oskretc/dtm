@@ -59,6 +59,13 @@ class DTM:
         returns 
         """
         return self.DataOut # should raise NotImplementedError()
+
+    def SendStr(self):
+        """function Send
+        
+        returns 
+        """
+        return ''.join(chr(e) for e in self.DataOut) # should raise NotImplementedError()        
     
     def StartTXTest(self, Freq, PayloadSize, PacketType):
         """function StartTXTest
