@@ -18,19 +18,23 @@ mydtm=DTM()
 
 mydtm.Reset()
 PrintOutput("Reset" , mydtm.Send())
-strdata= ''.join(chr(e) for e in mydtm.Send())
-print strdata
-DTMPort.write(strdata)
+DTMPort.write(mydtm.SendStr())
+time.sleep(1)
 
 try:
-    mydtm.StartRXTest(0,0,3)
+    mydtm.StartTXTest(0,37,0)
+    PrintOutput("Start TX" , mydtm.Send())
+    DTMPort.write(mydtm.SendStr())
+    time.sleep(2)
 except ErrorsDTM as instance:
+    print "error"
     a=0
     
-PrintOutput("Start RX" , mydtm.Send())
-mydtm.StartTXTest(0,0,0)
-PrintOutput("Start TX" , mydtm.Send())
+
+
 mydtm.TestEnd()
-PrintOutput("Test End" , mydtm.Send())
+DTMPort.write(mydtm.SendStr())
+PrintOutput("TestEnd" , mydtm.Send())
+
 
 DTMPort.close()
