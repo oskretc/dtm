@@ -1,9 +1,12 @@
+import serial
+import time
+
 from DTM import DTM
 from ErrorsDTM import ErrorsDTM
-from nDTM import nDTM
+#from nDTM import nDTM
 
-
-
+Uart1 = '/dev/ttyAMA0'
+DTMPort = serial.Serial(Uart1, 19200, timeout=1)
 
 def PrintOutput(Cmd, DtmData):
     
@@ -15,6 +18,10 @@ mydtm=DTM()
 
 mydtm.Reset()
 PrintOutput("Reset" , mydtm.Send())
+strdata= ''.join(chr(e) for e in mydtm.Send())
+print strdata
+DTMPort.write(strdata)
+
 try:
     mydtm.StartRXTest(0,0,3)
 except ErrorsDTM as instance:
@@ -25,3 +32,5 @@ mydtm.StartTXTest(0,0,0)
 PrintOutput("Start TX" , mydtm.Send())
 mydtm.TestEnd()
 PrintOutput("Test End" , mydtm.Send())
+
+DTMPort.close()
