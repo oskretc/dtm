@@ -1,3 +1,5 @@
+from ErrorsDTM import ErrorsDTM
+from ErrorsDTM import FrequencyError
 
 class DTM:
     """Class DTM
@@ -25,6 +27,8 @@ class DTM:
         Freq=Freq & 0b00111111
         if (Freq<=39 & Freq>=0):
             self.Frequency=Freq & 0b00111111
+        else: 
+            raise FrequencyError(Freq)
         
         
         return None # should raise NotImplementedError()
@@ -54,7 +58,7 @@ class DTM:
         
         returns 
         """
-        return None # should raise NotImplementedError()
+        return self.DataOut # should raise NotImplementedError()
     
     def StartTXTest(self, Freq, PayloadSize, PacketType):
         """function StartTXTest
