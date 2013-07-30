@@ -19,18 +19,28 @@ mydtm=DTM(1)
 try:
     mydtm.Reset()
     DTMPort.write(mydtm.SendStr())
+    Response=DTMPort.read(2)
+    mydtm.ParseResponseStr(Response)
     time.sleep(1)
+    
     #mydtm.StartRXTest(0,0,1)
-    mydtm.StartTXTest(Freq=0, Length=37, PacketType=3)
+    
+    mydtm.StartRXTest(Freq=0, Length=37, PacketType=3)
     DTMPort.write(mydtm.SendStr())
-    time.sleep(10)
+    Response=DTMPort.read(2)
+    mydtm.ParseResponseStr(Response)
+    time.sleep(2)    
+    
     mydtm.TestEnd()
     DTMPort.write(mydtm.SendStr())
-    Response=[0x01,0x00]
-    mydtm.ParseResponse(Response)
+    time.sleep(0.001)    
+    Response=DTMPort.read(2)
+    mydtm.ParseResponseStr(Response)
+    
+
 
 except ErrorsDTM as instance:
     print instance.__class__.__name__
     
-
-DTMPort.close()
+finally:
+    DTMPort.close()

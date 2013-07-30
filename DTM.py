@@ -161,6 +161,7 @@ class DTM:
             i+=1
         self.ParseResponse(DataIn)
     def ParseResponse(self, DataIn):
+        print DataIn
         if DataIn[1] & 0b10000000:
             self.Event=1
             self.PacketCount=((DataIn[1] & 0b01111111) * 0x100) + DataIn[0]
