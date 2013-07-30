@@ -150,6 +150,16 @@ class DTM:
         if self.Verboise:
             print self.CMD_TXT[self.Command] + "->MSB:  " + "0x{0:02x}".format(self.DataOut[0]) + "  LSB:  " + "0x{0:02x}".format(self.DataOut[1])    
     
+    def ParseResponseStr(self, StrData):
+        i=0
+        DataIn=[0,0]
+        for data in StrData:
+            try:
+                DataIn[i] = ord(str(data))
+            except ValueError:
+                DataIn[i] = 0
+            i+=1
+        self.ParseResponse(DataIn)
     def ParseResponse(self, DataIn):
         if DataIn[1] & 0b10000000:
             self.Event=1
