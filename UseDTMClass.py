@@ -13,28 +13,24 @@ def PrintOutput(Cmd, DtmData):
     print Cmd + "->MSB:  " + "0x{0:02x}".format(DtmData[0]) + "  LSB:  " + "0x{0:02x}".format(DtmData[1])
 
 
-mydtm=DTM()
+mydtm=DTM(1)
 #myndtm=nDTM()
 
-mydtm.Reset()
-PrintOutput("Reset" , mydtm.Send())
-DTMPort.write(mydtm.SendStr())
-time.sleep(1)
-
 try:
-    mydtm.StartTXTest(0,37,0)
-    PrintOutput("Start TX" , mydtm.Send())
+    mydtm.Reset()
     DTMPort.write(mydtm.SendStr())
-    time.sleep(2)
+    time.sleep(1)
+    #mydtm.StartRXTest(0,0,1)
+    mydtm.StartTXTest(Freq=0, Length=37, PacketType=3)
+    DTMPort.write(mydtm.SendStr())
+    time.sleep(10)
+    mydtm.TestEnd()
+    DTMPort.write(mydtm.SendStr())
+    Response=[0x01,0x00]
+    mydtm.ParseResponse(Response)
+
 except ErrorsDTM as instance:
-    print "error"
-    a=0
+    print instance.__class__.__name__
     
-
-
-mydtm.TestEnd()
-DTMPort.write(mydtm.SendStr())
-PrintOutput("TestEnd" , mydtm.Send())
-
 
 DTMPort.close()
