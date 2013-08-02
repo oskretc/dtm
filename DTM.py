@@ -153,21 +153,27 @@ class DTM:
     def ParseResponseStr(self, StrData):
         i=0
         DataIn=[0,0]
-        for data in StrData:
-            try:
-                DataIn[i] = ord(str(data))
-            except ValueError:
-                DataIn[i] = 0
-            i+=1
+        if len(StrData)==2:
+            for data in StrData:
+                try:
+                    DataIn[i] = ord(str(data))
+                except ValueError:
+                    DataIn[i] = 0
+                i+=1
+            
+        else:
+            DataIn=[0xFF,0xFF]
+            
         self.ParseResponse(DataIn)
+            
     def ParseResponse(self, DataIn):
         print DataIn
-        if DataIn[1] & 0b10000000:
+        if DataIn[0] & 0b10000000:
             self.Event=1
-            self.PacketCount=((DataIn[1] & 0b01111111) * 0x100) + DataIn[0]
+            self.PacketCount=((DataIn[0] & 0b01111111) * 0x100) + DataIn[1]
         else:
             self.Event=0
-            if DataIn[0] & 0b00000001:
+            if DataIn[1] & 0b00000001:
                 self.Status=1
             else:
                 self.Status=0
