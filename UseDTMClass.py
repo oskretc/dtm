@@ -2,6 +2,10 @@ import serial
 import time
 import sys  #Retry loop needed this
 
+sys.path.insert(0, '/usr/share/adafruit/webide/repositories/tcp1')
+
+from TCPClass import C3POServer
+
 from DTM import DTM
 from ErrorsDTM import ErrorsDTM
 
@@ -48,10 +52,9 @@ def fancyretryloop(attempts, timeout=None, delay=0, backoff=1):
     raise
 
 
+
 #from nDTM import nDTM
 
-Uart1 = '/dev/ttyAMA0'
-DTMPort = serial.Serial(Uart1, 19200, timeout=1)
 
 def ReadUartWithRetry(Count):
     for retry in fancyretryloop(10, timeout=1):
@@ -62,10 +65,89 @@ def ReadUartWithRetry(Count):
             time.sleep(0.01) 
             retry()
     return Response
+    
+def DTMMode(mydtm):
+    mydtm.DataOut=[0x32, 0x06]
+    DTMPort.write(mydtm.SendStr())
+    mydtm.DataOut=[0x3E, 0x00]
+    DTMPort.write(mydtm.SendStr())    
+    Response=ReadUartWithRetry(2)       
+    mydtm.ParseResponseStr(Response)
+    #time.sleep(1)
+
+def DTMReset(mydtm):
+    mydtm.Reset()
+    DTMPort.write(mydtm.SendStr())
+    #time.sleep(0.001) 
+    Response=ReadUartWithRetry(2)       
+    mydtm.ParseResponseStr(Response)
+    #time.sleep(1)
+    
+def DTMStartTX(mydtm,Freq,Length,PacketType):
+    mydtm.StartTXTest(Freq, Length, PacketType)
+    DTMPort.write(mydtm.SendStr())
+    Response=ReadUartWithRetry(2)       
+    mydtm.ParseResponseStr(Response)
+    #time.sleep(5)
+    
+def DTMStartRX(mydtm,Freq,Length,PacketType):
+    mydtm.StartRXTest(Freq,Length,PacketType)
+    DTMPort.write(mydtm.SendStr())
+    #time.sleep(0.001) 
+    Response=ReadUartWithRetry(2)       
+    mydtm.ParseResponseStr(Response)
+    #time.sleep(5)    
+    
+def DTMTestEnd(mydtm):
+    mydtm.TestEnd()
+    DTMPort.write(mydtm.SendStr())
+    #time.sleep(0.001)    
+    Response=ReadUartWithRetry(2)       
+    mydtm.ParseResponseStr(Response)
+    #time.sleep(1)  
+
+Uart1 = '/dev/ttyAMA0'
+DTMPort = serial.Serial(Uart1, 19200, timeout=1)
 
 mydtm=DTM(1)
 #myndtm=nDTM()
 Debug=0
+
+
+print "trying to establish the server"    
+s=C3POServer()
+
+try:
+    while 1:
+        print "listening slow"
+        s.StartListen()
+        s.DoConnect()
+        print '...connected!', s.Address
+
+        DataIn=s.RecvData()   #Receive Commands
+
+        
+        eval(DataIn)
+        
+        s.SendData("OK:" + mydtm.RspMsg)     #Send ACK on the Command
+        s.CloseConnection()
+        
+except ErrorsDTM as instance:
+    print instance.__class__.__name__        
+        
+        
+except KeyboardInterrupt:
+    print "Keyboard Detected"
+finally:
+    print "Closing Server"
+    s.CloseServer
+    print "Closing Uart"
+    DTMPort.close()
+
+    
+"""    
+
+
 try:
     mydtm.Reset()
     DTMPort.write(mydtm.SendStr())
@@ -110,6 +192,16 @@ try:
     Response=ReadUartWithRetry(2)       
     mydtm.ParseResponseStr(Response)
     
+    
+        if DataIn=="DTMReset":
+           DTMReset(mydtm)
+        if DataIn=="DTMStartTX":
+            DTMStartTX(mydtm)
+        if DataIn=="DTMStartRX":
+            DTMStartRX(mydtm)
+        if DataIn=="DTMTestEnd":
+            DTMTestEnd(mydtm)
+            
 
 
 except ErrorsDTM as instance:
@@ -118,3 +210,5 @@ except ErrorsDTM as instance:
 finally:
     DTMPort.close()
     print "Port Closed"
+
+"""

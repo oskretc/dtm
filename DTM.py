@@ -178,15 +178,17 @@ class DTM:
             else:
                 self.Status=0
         
-        if self.Verboise:
-            if self.Event:
-                print "Packet report with PacketCount= : " + str(self.PacketCount)
-            else:
-                print "Status message:"
-                if self.Status: 
-                    print "\t\tError"
-                else:
-                    print "\t\tSuccess"
     
+        if self.Event:
+            self.RspMsg  = "Packet report with PacketCount= : " + str(self.PacketCount)
+        else:
+            self.RspMsg = "Status message:"
+            if self.Status: 
+                self.RspMsg += "Error"
+            else:
+                self.RspMsg += "Success"
+                
+        if self.Verboise:
+            print self.RspMsg
     
     
